@@ -1,0 +1,50 @@
+## Run in Qiime2
+
+## Activate Qimee2.2019.10
+
+Conda activate Qimee2.2019.10
+
+
+#1 Import Cutadapt results data to Qiime2
+
+# Import clean concatenate cutadapt result files through manifest file to Qiime2 artifact (look manifest file in Lombok_v9_seqfile_manifest.csv)
+
+qiime tools import\
+ --type 'SampleData[PairedEndSequencesWithQuality]'\
+ --input-path Lombok_v9_seqfile_manifest.csv\
+ --output-path Lombok_v9_18_demux.qza\					#as PairedEndFastqManifestPhred33 
+ --input-format PairedEndFastqManifestPhred33
+
+
+#2 Visualisation summerize table
+
+qiime demux summarize --i-data Lombok_v9_18_demux.qza --o-visualization Lombok_v9_18_demux.qzv 
+
+
+#3 DADA2 processing
+
+qiime dada2 denoise-paired \
+  --i-demultiplexed-seqs Lombok_v9_18_demux.qza \
+  --p-trunc-len-f 0 \
+  --p-trunc-len-r 0 \
+  --o-table Lombok02_v9_18_table.qza \ 						#as FeatureTable[Frequency] 
+  --o-representative-sequences Lombok02_v9_18-rep-seqs.qza \			#as FeatureData[Sequence]
+  --o-denoising-stats Lombok02_v9_18-stats.qza					#as SampleData[DADA2Stats] 
+
+
+#4 Visualisation DADA2 table results
+
+qiime metadata tabulate --m-input-file Lombok02_v9_18-stats.qza \		# DADA2 statistics table
+  --o-visualization Lombok02_v9_18-stats.qzv
+
+qiime feature-table tabulate-seqs --i-data Lombok02_v9_18-rep-seqs.qza \	# ASVs or OTUs table 
+  --o-visualization Lombok02_v9_18-rep-seqs.qzv
+
+
+#5 Using metadata file first as part of feature table file (look metadata in Metadata_Lombok02_v9_18.tsv)
+
+qiime feature-table summarize --i-table Lombok02_v9_18_table.qza \		# Features table
+  --o-visualization Lombok02_v9_18-table.qzv \
+  --m-sample-metadata-file Metadata_Lombok02_v9_18.tsv
+
+## All of visual artifact file in .qzv can be seen in Qiime-view (https://view.qiime2.org/)

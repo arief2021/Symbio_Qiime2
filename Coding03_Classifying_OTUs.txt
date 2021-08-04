@@ -1,0 +1,88 @@
+## Run in Qiime2
+
+## Activate Qimee2.2019.10
+
+Conda activate Qimee2.2019.10
+
+
+#1 Taking SSU 18S sequence data from SILVA database
+
+# Download SILVA/Qiime release 132 for rRNA SSU-18S data in https://www.arb-silva.de/download/archive/qiime/ (access in 12/16/2019)
+# Take sequence file in 97%: silva_132_97_18S.fna and rename taxonomy_all_levels.txt to taxonomy_all_levels_97.txt
+# Take sequence file in 99%: silva_132_99_18S.fna and rename taxonomy_all_levels.txt to taxonomy_all_levels_99.txt
+
+
+#2 Make folder and get in
+
+mkdir Lombok_v9_18-training-feature-classifiers
+cd Lombok_v9_18-training-feature-classifiers
+
+
+#3 Import SILVA sequence reference data to Qiime2
+
+qiime tools import --type 'FeatureData[Sequence]' \
+  --input-path silva_132_97_18S.fna \
+  --output-path Lombok02_v9_18-97_18S_otus.qza			#as FeatureData[Sequence] used for 97%/ 99% sequence references
+
+# Repeat instruction above, replace 'silva_132_97_18S.fna' to 'silva_132_99_18S.fna' and 'Lombok02_v9_18-97_18S_otus.qza' to 'Lombok02_v9_18-99_18S_otus.qza'
+
+
+#2 Import SILVA taxonomy reference data to Qiime2
+
+qiime tools import --type 'FeatureData[Taxonomy]' \
+  --input-format HeaderlessTSVTaxonomyFormat \
+  --input-path taxonomy_all_levels_97.txt \
+  --output-path Lombok02_v9_18-97_18S_ref_taxonomy.qza		#as FeatureData[Taxonomy] used for 97%/ 99% taxonomy references
+
+# Repeat instruction above, replace 'taxonomy_all_levels_97.txt' to 'taxonomy_all_levels_99.txt' and 'Lombok02_v9_18-97_18S_ref_taxonomy.qza' to 'Lombok02_v9_18-99_18S_ref_taxonomy.qza'
+ 
+
+#3 make primers based sequence reference by extract reads of SILVA sequence database 
+
+qiime feature-classifier extract-reads --i-sequences Lombok02_v9_18-97_18S_otus.qza \
+  --p-f-primer TTGTACACACCGCCC \
+  --p-r-primer CCTTCYGCAGGTTCACCTAC \
+  --o-reads Lombok02_v9_18-97_18S_ref-seqs.qza			#as FeatureData[Sequence]
+
+# Repeat instruction above, replace 'Lombok02_v9_18-97_18S_otus.qza' to 'Lombok02_v9_18-99_18S_otus.qza' and 'Lombok_v9_18-97_18S_ref-seqs.qza' to 'Lombok_v9_18-99_18S_ref-seqs.qza'
+ 
+
+#4 Making and get a trained classifer using extract reads and taxonomy references
+ 
+qiime feature-classifier fit-classifier-naive-bayes \
+  --i-reference-reads Lombok02_v9_18-97_18S_ref-seqs.qza \
+  --i-reference-taxonomy Lombok02_v9_18-97_18S_ref_taxonomy.qza \
+  --o-classifier Lombok02_v9_18-97_18S_classifier.qza		#as trained classifer
+
+# Repeat instruction above, replace 'Lombok_v9_18-97_18S_ref-seqs.qza' to 'Lombok_v9_18-99_18S_ref-seqs.qza' and 'Lombok02_v9_18-97_18S_classifier.qza' to 'Lombok02_v9_18-99_18S_classifier.qza'
+
+
+#5 Get out folder
+
+cd ../
+
+
+#6 Classifying OTUs using trained classifier:
+
+qiime feature-classifier classify-sklearn \
+  --i-classifier Lombok_v9_18-training-feature-classifiers/Lombok02_v9_18-97_18S_classifier.qza \
+  --i-reads Lombok02_v9_18-rep-seqs.qza \
+  --o-classification Lombok02_v9_18-97_18S_taxonomy.qza		#as FeatureData[Taxonomy] used as result in OTUs classification table
+  
+# Repeat instruction above, replace 'Lombok02_v9_18-97_18S_classifier.qza' to 'Lombok02_v9_18-99_18S_classifier.qza' and 'Lombok02_v9_18-97_18S_taxonomy.qza' to 'Lombok02_v9_18-99_18S_taxonomy.qza'
+
+
+#7 Visualization tabulate taxonomy table
+
+qiime metadata tabulate --m-input-file Lombok02_v9_18-97_18S_taxonomy.qza \
+  --o-visualization Lombok02_v9_18-99_18S_taxonomy.qzv
+
+# Repeat instruction above, replace 'Lombok02_v9_18-97_18S_taxonomy.qza' to 'Lombok02_v9_18-99_18S_taxonomy.qza' and 'Lombok02_v9_18-97_18S_taxonomy.qzv' to 'Lombok02_v9_18-99_18S_taxonomy.qzv'
+
+
+#8 Export and convert artifact of taxonomy file in .qza to .tsv
+
+qiime tools export --input-path Lombok02_v9_18-97_18S_taxonomy.qza \
+ --output-path Taxon-Table
+
+# Repeat instruction above, replace 'Lombok02_v9_18-97_18S_taxonomy.qza' to 'Lombok02_v9_18-99_18S_taxonomy.qza'
