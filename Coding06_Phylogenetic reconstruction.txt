@@ -1,0 +1,73 @@
+## Run in Qiime2
+
+## Activate Qimee2.2019.10
+
+Conda activate Qimee2.2019.10
+
+
+#1 Export putative Symbiodiniaceae sequence artifact to fasta file
+
+qiime tools export --input-path Lombok02_Symbio_v9_18-99-rep-seqs.qza \
+ --output-path Symbio-Sequence-Table
+
+# Get in Symbio-Sequence-Table folder, rename dna-sequences.fasta to Lombok02_Symbio_v9_18-99-rep-seqs.fasta
+
+
+#2 Change the sequence label of fasta file
+
+# Convert Lombok02_Symbio_v9_18-99-rep-seqs.fasta to table in csv file using format conversion tool
+# Change the feature_id label in Lombok02_Symbio_v9_18-99-rep-seqs.fasta to OTU.sym_id as in sheet Symbiodiniaceae in File S2.xlsx
+# Convert corrected csv file to tsv format, and the corvert to single-line fasta file using format conversion tool
+# Put name this fasta files as Lombok02_v9_kode_sym_rep-seq_corrected.fasta
+
+
+#3 Import corrected fasta file of putative Symbiodiniaceae to Qiime2
+
+qiime tools import \
+  --type 'FeatureData[Sequence]' \
+  --input-path Lombok02_v9_kode_sym_rep-seq_corrected.fasta \
+  --output-path Lombok02_v9_kode_sym_rep-seq_corrected.qza
+
+
+#4 Merge sequences file of both putative Symbiodiniaceae and sequence references
+
+qiime feature-table merge-seqs \
+  --i-data Lombok02_v9_kode_sym_rep-seq_corrected.qza \
+  --i-data SymV9_ref.qza \
+  --o-merged-data Insertion03-sym_Lbk_v9.qza
+
+
+#5 Sequences alignment
+
+qiime alignment mafft \
+  --i-sequences Insertion03-sym_Lbk_v9.qza \
+  --o-alignment Aligned-insertion03-sym_lbk_v9.qza
+
+
+#6 Alignment masking
+
+qiime alignment mask \
+  --i-alignment Aligned-insertion03-sym_lbk_v9.qza \
+  --o-masked-alignment Mask-aligned_insertion03-sym_lbk_v9.qza
+
+
+#7 Reconstruct denovo phylogenetic
+
+qiime phylogeny iqtree-ultrafast-bootstrap \
+  --i-alignment Mask-aligned_insertion03-sym_Lbk_v9.qza \
+  --p-n-runs 10 \
+  --p-bootstrap-replicates 1000 \
+  --p-n-max-ufboot-iter 2000 \
+  --p-allnni \
+  --p-alrt 1000 \
+  --p-abayes \
+  --p-lbp 1000 \
+  --p-bnni \
+  --p-safe \
+  --o-tree unrooted-iqtree-ufboot-10run-insertion03.3-sym_Lbk_v9.qza \
+  --verbose
+
+# To visualize tree file, can be used a tree visualisation tool, eg. iTOL (https://itol.embl.de/)
+
+ 
+ 

@@ -1,0 +1,130 @@
+## Run in Qiime2
+
+## Activate Qimee2.2019.10
+
+Conda activate Qimee2.2019.10
+
+## Notes: Using any format conversion tool is very usefull for handling import and export files in Qiime2
+##	  Qiime2 only compatible with sequence file in fna and single-line fasta format 
+##	  Fasta file from NCBI, tipically is multi-line fasta fomat, therefore must be convert first to single-line fasta format
+
+## Some general procedures:
+# Sequence tipe artifact in Qiime2 can be exported as fasta file and fasta file can be imported to Qiime2 as artifact
+# Using format conversion tool that can convert fasta to single-line fasta, table (csv or tsv), and convert sequence text file in tsv to fasta file
+
+
+#1 Making and get sequence reference data into fasta file
+
+# Take sequence reference data in File S4.xlsx
+# Use accession number to download fasta file each of sequence reference file from NCBI database, one by one
+# Especially for sequence references from Decelle et al. 2018 (SymV9_54 to SymV9_72), copy each of nucleotide sequence text as input data to make fasta file
+# Convert fasta file from NCBI to single-line fasta
+# Put name a fasta file resulted same as Reference_id in File S4.xlsx respectively
+
+
+#2 Import 82 reference fasta files to artifact Qiime2
+
+declare -a ARRAY=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34" "35" "36" "37" "38" "39" "40" "41" "42" "43" "44" "45" "46" "47" "48" "49" "50" "51" "52" "53" "54" "55" "56" "57" "58" "59" "60" "61" "62" "63" "64" "65" "66" "67" "68" "69" "70" "71" "72" "73" "74" "75" "76" "77" "78" "79" "80" "81" "82")
+
+for i in "${ARRAY[@]}" 
+do
+
+qiime tools import \
+  --type 'FeatureData[Sequence]' \
+  --input-path SymV9_${i}.fasta \
+  --output-path SymV9_${i}.qza
+
+done
+
+
+#3 Merge 82 sequence artifact files to be one artifact file
+
+qiime feature-table merge-seqs \
+  --i-data SymV9_1.qza \
+  --i-data SymV9_2.qza \
+  --i-data SymV9_3.qza \
+  --i-data SymV9_4.qza \
+  --i-data SymV9_5.qza \
+  --i-data SymV9_6.qza \
+  --i-data SymV9_7.qza \
+  --i-data SymV9_8.qza \
+  --i-data SymV9_9.qza \
+  --i-data SymV9_10.qza \
+  --i-data SymV9_11.qza \
+  --i-data SymV9_12.qza \
+  --i-data SymV9_13.qza \
+  --i-data SymV9_14.qza \
+  --i-data SymV9_15.qza \
+  --i-data SymV9_16.qza \
+  --i-data SymV9_17.qza \
+  --i-data SymV9_18.qza \
+  --i-data SymV9_19.qza \
+  --i-data SymV9_20.qza \
+  --i-data SymV9_21.qza \
+  --i-data SymV9_22.qza \
+  --i-data SymV9_23.qza \
+  --i-data SymV9_24.qza \
+  --i-data SymV9_25.qza \
+  --i-data SymV9_26.qza \
+  --i-data SymV9_27.qza \
+  --i-data SymV9_28.qza \
+  --i-data SymV9_29.qza \
+  --i-data SymV9_30.qza \
+  --i-data SymV9_31.qza \
+  --i-data SymV9_32.qza \
+  --i-data SymV9_33.qza \
+  --i-data SymV9_34.qza \
+  --i-data SymV9_35.qza \
+  --i-data SymV9_36.qza \
+  --i-data SymV9_37.qza \
+  --i-data SymV9_38.qza \
+  --i-data SymV9_39.qza \
+  --i-data SymV9_40.qza \
+  --i-data SymV9_41.qza \
+  --i-data SymV9_42.qza \
+  --i-data SymV9_43.qza \
+  --i-data SymV9_44.qza \
+  --i-data SymV9_45.qza \
+  --i-data SymV9_46.qza \
+  --i-data SymV9_47.qza \
+  --i-data SymV9_48.qza \
+  --i-data SymV9_49.qza \
+  --i-data SymV9_50.qza \
+  --i-data SymV9_51.qza \
+  --i-data SymV9_52.qza \
+  --i-data SymV9_53.qza \
+  --i-data SymV9_54.qza \
+  --i-data SymV9_55.qza \
+  --i-data SymV9_56.qza \
+  --i-data SymV9_57.qza \
+  --i-data SymV9_58.qza \
+  --i-data SymV9_59.qza \
+  --i-data SymV9_60.qza \
+  --i-data SymV9_61.qza \
+  --i-data SymV9_62.qza \
+  --i-data SymV9_63.qza \
+  --i-data SymV9_64.qza \
+  --i-data SymV9_65.qza \
+  --i-data SymV9_66.qza \
+  --i-data SymV9_67.qza \
+  --i-data SymV9_68.qza \
+  --i-data SymV9_69.qza \
+  --i-data SymV9_70.qza \
+  --i-data SymV9_71.qza \
+  --i-data SymV9_72.qza \
+  --i-data SymV9_73.qza \
+  --i-data SymV9_74.qza \
+  --i-data SymV9_75.qza \
+  --i-data SymV9_76.qza \
+  --i-data SymV9_77.qza \
+  --i-data SymV9_78.qza \
+  --i-data SymV9_79.qza \
+  --i-data SymV9_80.qza \
+  --i-data SymV9_81.qza \
+  --i-data SymV9_82.qza \
+  --o-merged-data SymV9_ref.qza
+
+
+
+
+

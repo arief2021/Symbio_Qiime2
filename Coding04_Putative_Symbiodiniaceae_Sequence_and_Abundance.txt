@@ -1,0 +1,57 @@
+## Run in Qiime2
+
+## Activate Qimee2.2019.10
+
+Conda activate Qimee2.2019.10
+
+
+#1 Making and get putative Symbiodiniaceae abundance data by taxa filter-table plugin   
+# Here Polarella was suspected as putative Symbiodiniaceae therefore will be filtered too
+
+qiime taxa filter-table --i-table Lombok02_v9_18_table.qza \
+ --i-taxonomy Lombok02_v9_18-99_18S_taxonomy.qza \
+ --p-include D_7__Symbiodinium,D_7__Polarella \
+ --p-query-delimiter ',' \
+ --o-filtered-sequences Lombok02_v9_18_99-18S-symbio-mod-filtered.qza
+
+
+#2. Visualization of sequence table
+ 
+qiime metadata tabulate --m-input-file Lombok02_v9_18_99-18S-symbio-mod-filtered.qza \
+ --o-visualization Lombok02_v9_18_99-18S-symbio-mod-filtered.qzv
+
+qiime feature-table summarize --i-table Lombok02_v9_18_99-18S-symbio-mod-filtered.qza \
+  --o-visualization Lombok02_v9_18_99-18S-symbio-summary.qzv \
+  --m-sample-metadata-file Metadata_Lombok02_v9_18.tsv
+
+
+#3 Export abudance data from Qiime2
+
+qiime tools export --input-path Lombok02_v9_18_99-18S-symbio-mod-filtered.qza \
+ --output-path Taxon-Table-Symbio		as BIOMV210DirFmt to directory Taxon-Table-Symbio
+
+# Get in Taxon-Table-Symbio folder, rename feature-table.biom to Lombok02_v9_18-99-18S-Symbio-table.biom
+
+
+#4 Convert .biom to .tsv in order to can be save in excell
+
+biom convert -i Lombok02_v9_18-99-18S-Symbio-table.biom \
+ -o Lombok02_v9_18-99-18S-Symbio-table.tsv --to-tsv		# As a abundance data table
+
+
+#5 Making and get putative Symbiodiniaceae sequence data by taxa filter-seqs plugin
+
+qiime taxa filter-seqs --i-sequences Lombok02_v9_18-rep-seqs.qza \
+ --i-taxonomy Lombok02_v9_18-99_18S_taxonomy.qza \
+ --p-include D_7__Symbiodinium,D_7__Polarella \
+ --p-query-delimiter ',' \
+ --o-filtered-sequences Lombok02_Symbio_v9_18-99-rep-seqs.qza
+
+
+#6 Visualisation
+
+qiime feature-table tabulate-seqs --i-data Lombok02_Symbio_v9_18-99-rep-seqs.qza \
+  --o-visualization Lombok02_Symbio_v9_18-99-rep-seqs.qzv
+
+
+
